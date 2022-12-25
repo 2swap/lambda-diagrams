@@ -301,12 +301,12 @@ reduceOneCbv t = go t
     Nothing -> deep t
 --    deep u | debug "deep" u = undefined
   deep (Lam u) = Lam <$> deep u
-  deep u       = (reduceOneCbv' u <|> reduceOneLmIm u)
+  deep u       = (reduceOneCbv' u <|> reduceOneRmOm u)
 
 reduceMany :: Term -> [Term]
 reduceMany t =
   t
-    : (case reduceOneLmIm t of
+    : (case reduceOneRmOm t of
         Just t' -> reduceMany t'
         Nothing -> []
       )
@@ -370,10 +370,10 @@ _drawTerm t =
     (fullTerm # translate (V2 4 6) # alignTL # withEnvelope
         (rect 160 90 # alignTL :: Diagram B)
       )
-      <> (rect 160 90 # bg white # alignTL # lc black)
-  background = rect 160 90 # bg white
+      <> (rect 160 90 # alignTL)
+  background = rect 160 90
 
-drawTerm t = draw t # bg white # alignTL
+drawTerm t = draw t # lc white # alignTL
 
 extents :: [Term] -> V2 Double
 extents ts = foldl' vmax (V2 0 0) (map tdims ts)
@@ -387,12 +387,12 @@ images t = map normalize imgs
   ts       = reduceMany t
   imgs     = map drawTerm ts
   (V2 w h) = extents ts
-  bgrect   = rect (w + 10) (h + 10) # fc white # lw 0 # alignTL
+  bgrect   = rect (w + 10) (h + 10) # lw 0 # alignTL
   --normalize img = (img <> bgrect)
   normalize img = img
 
 _movie :: Term -> [Diagram B]
-_movie t = replicate 50 (head imgs) ++ imgs where imgs = images t
+_movie t = images t
 
 {- Main -}
 
@@ -407,7 +407,7 @@ process f = do
 imgMain t = zipWithM_ render [0 :: Int ..] (_movie t)
  where
   render i img = renderRasterific (filePath i) size img
-  filePath i = printf "/tmp/out_%04d.png" i
+  filePath i = printf "out/%04d.png" i
   --size = mkWidth 3840
   size = dims2D 1600 900
 

@@ -1,0 +1,80 @@
+-- Copyright 2018 Google LLC
+--
+-- Licensed under the Apache License, Version 2.0 (the "License");
+-- you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+--
+--     https://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+
+let
+  --misc
+  identity = \x -> x;
+  omega = \w -> w w;
+  omega_3 = \w -> w w w;
+  if_then_else = \i t e -> i t e;
+  half_tfpo = \x y -> y (x x y);
+  tfpo = half_tfpo half_tfpo;
+
+  --boolean logic
+  true = \a b -> a;
+  false = \a b -> b;
+  and = \a b -> a b false;
+  or = \a b -> a true b;
+  not = \a -> a false true;
+  xor = \a b -> a (b false true) (b true false);
+  -- todo unit_test_boolean_logic = 
+
+  --arithmetic
+  zero = \f x -> x;
+  one = \f x -> f x;
+  two = \f x -> f (f x);
+  three = \f x -> f (f (f x));
+  four = \f x -> f (f (f (f x)));
+  five = \f x -> f (f (f (f (f x))));
+  six = \f x -> f (f (f (f (f (f x)))));
+  succ = \m f x -> f (m f x);
+  add = \m n f x -> m f (n f x);
+  mult = \m n f x -> m (n f) x;
+  exp = \m n -> n m;
+  is_zero = \m -> m (and false) true;
+  neg_one = true;
+  is_neg_one = \q -> (q (and false) false) false (\x -> false) true;
+  succ_special = \q -> (is_neg_one q) zero (succ q);
+  pred = \m -> m succ_special neg_one;
+  fac_fp = (\f m -> if_then_else (is_zero m) one (mult m (f (pred m))));
+  fac = tfpo fac_fp;
+  is_even = \m -> m not true;
+  equals_fp = \f m n -> if_then_else (xor (is_zero m) (is_zero n)) false (or (and (is_zero m) (is_zero n)) (f (pred m) (pred n)));
+  equals = tfpo equals_fp;
+
+  --pairs
+  make_pair = \a b -> \z -> z a b;
+  pair_get_first = \p -> p true;
+  pair_get_last = \p -> p false;
+
+  --lists
+  nil_list = false;
+  make_list = \h t x y -> x h t;
+  list_get_head = \l -> l true identity;
+  list_get_tail = \l -> l false identity;
+  fold_fp = \t l f x -> f x (t f (list_get_tail l));
+  fold = tfpo fold_fp;
+
+  --do not edit, there is no semicolon at the end
+  donotedit = \x -> x
+
+in
+  fold (make_list four (make_list five nil_list)) add zero
+  --get_head (make_pair five two)
+  --exp five two
+  --fac two
+  --\j -> (j (is_even zero))(j (is_even one))(j (is_even two))(j (is_even three))
+  --\j -> (j (equals zero zero))(j (equals one zero))(j (equals two two))(j (equals one three))
+  --is_even three
+  --\f -> (\x -> f (x x))(\x -> f (x x))
