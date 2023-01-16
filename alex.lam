@@ -63,18 +63,23 @@ let
   make_list = \h t x y -> x h t;
   list_get_head = \l -> l true identity;
   list_get_tail = \l -> l false identity;
-  fold_fp = \t l f x -> f x (t f (list_get_tail l));
+  fold_fp = \t l f x -> f x (t (list_get_tail l) f (list_get_head l));
+--fold_fp =   \l f x -> f x (fold_fp (list_get_tail l) f (list_get_head l));
   fold = tfpo fold_fp;
+
+--
+
 
   --do not edit, there is no semicolon at the end
   donotedit = \x -> x
 
 in
-  fold (make_list four (make_list five nil_list)) add zero
+  --fold (make_list four (make_list five nil_list)) add zero
+  fold (make_list five nil_list) add zero
   --get_head (make_pair five two)
   --exp five two
   --fac two
   --\j -> (j (is_even zero))(j (is_even one))(j (is_even two))(j (is_even three))
   --\j -> (j (equals zero zero))(j (equals one zero))(j (equals two two))(j (equals one three))
   --is_even three
-  --\f -> (\x -> f (x x))(\x -> f (x x))
+  --\f -> (\x -> f (x x))(\x -> f x x))
