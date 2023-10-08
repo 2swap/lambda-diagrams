@@ -75,7 +75,8 @@ let
 
 in
   --fold (make_list four (make_list five nil_list)) add zero
-  fold (make_list five nil_list) add zero
+  tfpo
+  --fold (make_list five nil_list) add zero
   --get_head (make_pair five two)
   --exp five two
   --fac two
